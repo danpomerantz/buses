@@ -4,6 +4,7 @@ exports.GetInnerText = GetInnerText;
 exports.GetCleanInnerText = GetCleanInnerText;
 exports.CleanText = CleanText;
 exports.GetAttribute = GetAttribute;
+exports.NoTransform = NoTransform;
 var JsonQuery = require('./JsonQuery');
 var htmlparser = require('htmlparser');
 var htmlencode = require('htmlencode');
@@ -59,9 +60,9 @@ function ExtractList(jsonDom, request)
 }
 
 //wrapper function
-function ExtractFromPagesAsync(jsonDom, url, extractionRequests, callback)
+function ExtractFromPagesAsync(jsonDom, extractionRequests, callback)
 {
-	callback(ExtractFromPages(jsonDom, url, extractionRequests));
+	callback(ExtractFromPages(jsonDom, extractionRequests));
 }
 
 //takes as input array of extractionRequests
@@ -70,7 +71,7 @@ function ExtractFromPagesAsync(jsonDom, url, extractionRequests, callback)
 //name : string for attribute name
 //xpaths : array of xpaths
 //transformation : function specifying what string manipulations to do after extraction
-function ExtractFromPages(jsonDom, url, extractionRequests)
+function ExtractFromPages(jsonDom, extractionRequests)
 {
 	//ExtractionRequests is an array of objects containing:
 	//extraction name
@@ -95,7 +96,6 @@ function TryExtractions(jsonDom, attributeRequests, transformation)
 	for (var i = 0; i < attributeRequests.length; i++)
 	{
 		var nodeInfo = JsonQuery.GetTagByXPath(jsonDom, attributeRequests[i]);
-
 		if (nodeInfo != undefined)
 		{
 			//try text based transformation
@@ -108,6 +108,11 @@ function TryExtractions(jsonDom, attributeRequests, transformation)
 	}
 
 	return undefined;
+}
+
+function NoTransform(raw)
+{
+	return raw;
 }
 
 //extracts the text nodes at a particular level. Does not get deeper nodes.

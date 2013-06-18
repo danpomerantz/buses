@@ -1,0 +1,62 @@
+var system = require('system');
+var server = system.args[1];
+var data = system.args[2];
+//var searchUrl = system.args[1];
+//console.log(searchUrl);
+//var searchUrl = "http://www.redcoachusa.com";
+//var searchUrl = "http://www.google.com";
+//var sys = require('sys');
+//RedCoachSearch('Miami-Airport, FL', '13', 'Orlando, FL', '9', '06-18-2013');
+
+exports.RedCoachSearch = RedCoachSearch;
+
+function RedCoachSearch(departureTxt, departureId, arrivalTxt, arrivalId, departureDate)
+//{
+{
+//var data = "departureDate=" + departureDate + "&txtDeparture=" + departureTxt + "&txtArrival=" + arrivalTxt +
+ //   "&date_format=US&idDeparture=" + departureId + "idArrival=" + arrivalId;
+
+var page = require('webpage').create();
+var    server = 'https://websales.redcoachusa.com/public/websale/index';
+var    data = 'departureDate=' + departureDate + '&txtDeparture=' + departureTxt + '&txtArrival=' + 
+   arrivalTxt + '&date_format=US&idDeparture=' + departureId + '&idArrival=' + arrivalId;
+  // data = 'departureDate=06-18-2013&date_format=US&idDeparture=13&idArrival=9';
+
+page.open(server, 'post', data, function (status) {
+    if (status !== 'success') {
+        console.log('Unable to post!');
+    } else {
+        console.log(page.content);
+        page.render('results.png');
+    }
+    phantom.exit();
+});
+}
+/*
+var page = require('webpage').create();
+page.open(searchUrl, function(status) {
+	//page.injectJs("jquery.min.js", function()
+//		{
+	console.log(status);
+//	console.log(page.content);
+	var x = page.evaluate(function() { return document.getElementsByClassName("q_web_sale_label"); });
+	console.log("blah?");
+	//console.log(x);
+	console.log(x[0]);
+	console.log(x[1]);
+	//sys.puts(sys.inspect(x, false, null));
+	//var text = page.evaluate() {
+		//var form = document.getElementsByClassName("theme_web_sale");
+	//	return "";
+
+//	}
+	phantom.exit();
+
+//		});
+
+//	var title = page.evaluate(function() { 
+//		return document.title; 
+//	});
+//	console.log(title);
+
+});*/

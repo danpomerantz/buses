@@ -30,7 +30,8 @@ function GetTagByXPath(json, xpath)
 }
 
 //xpath looks like:
-//foo/bar[@attributeName1;@attributeName2]/blah
+//foo/bar[attributeName1=attributeValue1;attributeName2=attributeValue2]/blah
+//foo(0) means get the 0th one only
 //ex: html/body
 //base case: path is empty, return json
 //otherwise:
@@ -59,8 +60,19 @@ function GetTagsByXPath(json, xpath)
 	var combined = pieces.join("/");
 	
 	var results = new Array();
+
+	var number = -1;
+	if (queryPiece.indexOf('{') >= 0)
+	{
+		number = parseInt( ExtractTextFromBrackets(queryPiece, '{', '}') );
+		queryPiece = queryPiece.substring(0, queryPiece.indexOf('{'));
+	}
+
 	for (var i = 0; i < json.length; i++)
 	{
+		if (number < 0 || i == number)
+		{
+		//extractCount
 		if (MatchesTagAndAttribute(json[i], queryPiece))
 		{
 			//if it is already the last step
@@ -73,8 +85,8 @@ function GetTagsByXPath(json, xpath)
 				//recursively call on every child
 				//looks within every child for path of combined
 				results = results.concat(GetTagsByXPath(json[i].children, combined));
-	
 			}
+		}
 		}
 	}
 
@@ -91,7 +103,7 @@ function MatchesTagAndAttribute(node, tagAndAttribute)
 	{
 		nodeName = tagAndAttribute.substring(0, indexStartBracket);
 		//generate the attribute list
-		attributeList = ExtractTextFromBrackets(tagAndAttribute).split(';');
+		attributeList = ExtractTextFromBrackets(tagAndAttribute,'[', ']').split(';');
 	}
 
 	if (node.type == "tag" && node.name == nodeName && ContainsAttributes(node, attributeList))
@@ -104,12 +116,12 @@ function MatchesTagAndAttribute(node, tagAndAttribute)
 
 //input : foo[abc] (type: String)
 //output : abc (type: String)
-function ExtractTextFromBrackets(tagAndAttribute)
+//Works with configurable start and close parameters for brackets
+function ExtractTextFromBrackets(tagAndAttribute, openBracket, closeBracket)
 {
-	var indexStartBracket = tagAndAttribute.indexOf('[');
-	var indexEndBracket = tagAndAttribute.indexOf(']');
-	return tagAndAttribute.substr(indexStartBracket + 1, indexEndBracket - indexStartBracket - 1)
-
+	var indexStartBracket = tagAndAttribute.indexOf(openBracket);
+	var indexEndBracket = tagAndAttribute.indexOf(closeBracket);
+	return tagAndAttribute.substr(indexStartBracket + 1, indexEndBracket - indexStartBracket - 1);
 }
 
 function ContainsAttributes(node, attributeList)

@@ -109,7 +109,7 @@ function FindStopInformationFromPage(url, parser)
 		  transform : ExtractionLibrary.GetAttribute.bind(ExtractionLibrary.GetAttribute, "href")}
 	]
 
-	return ExtractionLibrary.ExtractFromPages(parser.dom, url, request);
+	return ExtractionLibrary.ExtractFromPages(parser.dom, request);
 }
 
 
