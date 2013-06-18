@@ -1,4 +1,5 @@
 exports.Download = downloadAndParse;
+exports.ParseHtml = parse;
 
 //executes callback with the input being a json formatted object representing the html page
 function downloadAndParse(urlString, callback)
@@ -36,6 +37,13 @@ function errorHandler(error) {
 	//try to follow redirects?
 	//allow retries?
 	console.log("Error : " + error.message);
+}
+
+//order needs to be callback,content in the function below to help with binding
+//but for the public api we present order in the standard way
+function parsePublic(content, callback)
+{
+	parse(content, callback);
 }
 
 function parse(callback, content) {
