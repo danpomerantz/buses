@@ -1,0 +1,11 @@
+The 2 files are:
+part 1) RedCoachStopDownloader.js
+part 2) ScheduleSearcher.js
+
+I ended up using a tool phantomjs to deal with dynamic content. I'm not sure if you'd consider it "cheating" or not, but I could not come up with a way to do it completely in nodejs. So I spawned a thread with phantomjs, downloaded the content, and came back. (The only place I make these calls is from DynamicDownload.js, so if there is a better way to do this, it could be updated there). I think I put all the phantomjs files to make it run in the branch, but on a different processor you'd need different binaries: http://phantomjs.org/download.html
+
+As far as implementation details, there are a few things:
+-Code works well, involves retries when there are failures
+-I did the program a little differently than maybe you intended. Instead of generating all the pairs of valid departure/arrival up front, I just extracted all the destinations and paired the list with itself. Then, I search for tickets from destination X to Y. In some cases this isn't found (or the search suggests something different). I think there might be a faster way (maybe using zombie module?) to actually select the elements of the form, but I was not able to do so. This affects the run time some as there are more pairs to attempt extraction.
+-The code is a bit slow to download every page and extract every page. The reason for this is I found the extraction was performed before the dynamic content was executed sometimes. This meant that no results were found. To work around this, I set a timeout of 10 seconds between download and start extraction. Between the 14 destination * 13 arrival places * 5 dates = 910 pages, this is somewhat slow (increasing the maximum threads might help slightly as the phantomjs commands all execute separately). If you want to test the code on a smaller set change lines 34 and 106 to be a constant instead of cityPairs.length
+-The multithreaded shared code got a bit more complicated than I realized it would and it feels a bit clumsy now. If I were doing this code at a production level I would move a lot of this into a separate module. There are things like trying to throttle the requests to slow it down that I feel would be better by adjusting the timeouts rather than always waiting the same amount.
